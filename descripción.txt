@@ -1,0 +1,2 @@
+El proyecto consiste en un detector de CO2, este esta conformado por un sensor MQ-2 con el que se puede analizar la calidad del aire. Tambien cuenta con una pantalla oled 
+que dira la calidad del aire en tres niveles; "BUENO", "MALO", "MUY MALO". Ademas de un buzzer que dira cuando cambia de esos niveles.
