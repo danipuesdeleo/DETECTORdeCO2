@@ -1,0 +1,106 @@
+#include <WiFi.h>
+#include <ThingSpeak.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+Adafruit_SSD1306 oled (128, 64, &Wire, -1);
+
+
+#define WRITE_KEY "O4BSYP1U4NVZXNQQ"
+#define CHANNEL_ID 1958193
+#define SSID "Estudiantes"
+#define PASSWORD "Educar_2018"
+#define DELAY_ENVIO 20000
+#define SENSOR_PIN 36
+
+
+WiFiClient cliente;
+
+
+
+unsigned long tiempoEspera = 0;
+
+
+void startWifi(){
+  Serial.begin(9600);
+  WiFi.begin(SSID,PASSWORD);
+  Serial.print("Conectando");
+  while (!WiFi.status() == WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+
+   Serial.print("\nSe conecto");
+
+   ThingSpeak.begin(cliente);
+
+}
+
+int readPresion(){
+
+  float ppm = analogRead(SENSOR_PIN);
+  
+  int aire = 0;
+  if(ppm >3500){ 
+  aire = 2;}
+  else if(ppm >1500){
+   
+  aire = 1;}
+  
+  aire = millis() % 3;
+  return aire;
+}
+
+
+
+void senData(){
+
+  int ppm = readPresion();
+  Serial.print(ppm);
+
+  ThingSpeak.setField(1,ppm);
+   //ThingSpeak.setField(2,ppm);
+    //ThingSpeak.setField(3,ppm);
+   //ThingSpeak.setField(4,ppm);
+  ThingSpeak.writeFields(CHANNEL_ID,WRITE_KEY);
+
+}
+
+void showLCD(){
+
+  int ppm = readPresion();
+  // el que lee esto es puto
+  //esto es una prueba para saber que tan rapido puedo escribir en teclado soy un pedazo
+   oled.clearDisplay();
+  oled.setCursor(0,0);
+  oled.setTextSize(2);
+  switch(ppm){
+  case 2: oled.print("lucero esta a\nmenos de 5m");
+          break;
+  case 1: oled.print("aire malo");
+           break;
+  default: oled.print("aire bueno");}
+}
+
+
+void setup() {
+  // put your setup code here, to run once:
+  oled.begin (SSD1306_SWITCHCAPVCC, 0x3C); /* Initialize display with address 0x3C */
+  
+  startWifi();
+    }
+
+void loop() {
+  // put your main code here, to run repeatedly:
+ 
+  if(millis() >= tiempoEspera + DELAY_ENVIO ){
+    tiempoEspera = millis();
+    senData();
+    Serial.println("SEND");
+  }
+
+
+  showLCD();
+}
