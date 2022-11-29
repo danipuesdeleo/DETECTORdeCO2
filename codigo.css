@@ -71,8 +71,7 @@ void senData(){
 void showLCD(){
 
   int ppm = readPresion();
-  // el que lee esto es puto
-  //esto es una prueba para saber que tan rapido puedo escribir en teclado soy un pedazo
+  
    oled.clearDisplay();
   oled.setCursor(0,0);
   oled.setTextSize(2);
